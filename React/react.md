@@ -2,7 +2,7 @@
 
 ## <span style="color:#FFA500"> 1. What’s the difference between controlled and uncontrolled components in React?  </span>
 
-Controlled components in React are those where the form data is managed by React state, meaning the component's state is the single source of truth for input values. Uncontrolled components, by contrast, store their own state internally within the DOM and React accesses the form values using refs.
+Controlled components have their value managed by React state, while uncontrolled components rely on the DOM’s internal state accessed with refs. Controlled components provide more predictable behavior.
 
 ### Controlled Components
 - React state holds the form data.
@@ -113,7 +113,7 @@ Cons:
 
 ## <span style="color:#FFA500"> 2. How do you optimize React components to avoid unnecessary re-renders? </span>
 
-To optimize React components and avoid unnecessary re-renders, use techniques like memoization, function and object stabilization, and careful state management. Here are practical strategies that help keep your React app performant:
+Use React.memo, useCallback for stable functions, and useMemo for expensive computations. Also ensure props are minimal and stable.
 
 Key Optimization Strategies
 - Use React.memo() for functional components. This prevents a component from re-rendering unless its props change, making it ideal for child components that receive unchanged props.
@@ -271,3 +271,90 @@ class ErrorBoundary extends React.Component {
 ```
 
 Error boundaries improve app stability by preventing errors in components from crashing the entire React app and allowing a graceful recovery.
+
+## <span style="color:#FFA500"> 6. What are React keys and why are they important?  </span>
+
+React keys are special attributes used when creating lists of elements—like items in a to-do list—to help React efficiently update and render components. Keys must be unique among siblings, so React can identify which items have changed, been added, or removed, making updates fast and preventing bugs.
+
+```jsx
+const todos = [
+  { id: 101, text: "Learn React" },
+  { id: 102, text: "Build a Project" }
+];
+
+const listItems = todos.map((todo) => 
+  <li key={todo.id}>{todo.text}</li>
+);
+```
+## <span style="color:#FFA500"> 7. What is React reconciliation?  </span>
+React reconciliation is the process that React uses to efficiently update the user interface when a component's state or props change. Instead of re-rendering the whole UI, React compares the previous and current versions of its virtual DOM and updates only the parts that have actually changed.
+
+How React Reconciliation Works
+- React keeps a lightweight copy of the real DOM called the "virtual DOM".
+
+- When state or props change, React creates a new virtual DOM tree and compares it with the previous one—this is called the “diffing” algorithm.
+
+- Only the differences—called "minimal updates"—are applied to the real DOM, making updates fast and efficient.
+
+### Example
+```jsx
+class Counter extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { count: 0 };
+  }
+  increment = () => {
+    this.setState({ count: this.state.count + 1 });
+  };
+  render() {
+    return (
+      <div>
+        <p>{this.state.count}</p>
+        <button onClick={this.increment}>Increment</button>
+      </div>
+    );
+  }
+}
+```
+Each time the "Increment" button is clicked, only the 'p' element displaying the count is updated in the real DOM. The rest of the UI stays untouched, thanks to reconciliation.
+
+## <span style="color:#FFA500"> 8. What is the difference between useState and useReducer. </span>
+The main difference between useState and useReducer in React is how they manage state and the kind of state logic they're suited for. useState is simple and best for handling individual or unrelated pieces of state, while useReducer is more powerful—ideal for managing complex state logic or related state updates.
+
+### useState
+```jsx
+import React, { useState } from "react";
+function Counter() {
+  const [count, setCount] = useState(0);
+  return (
+    <>
+      <p>{count}</p>
+      <button onClick={() => setCount(count + 1)}>Add One</button>
+    </>
+  );
+}
+```
+
+### useReducer
+```jsx
+import React, { useReducer } from "react";
+function reducer(state, action) {
+  switch (action.type) {
+    case "increment":
+      return { count: state.count + 1 };
+    default:
+      return state;
+  }
+}
+function Counter() {
+  const [state, dispatch] = useReducer(reducer, { count: 0 });
+  return (
+    <>
+      <p>{state.count}</p>
+      <button onClick={() => dispatch({ type: "increment" })}>
+        Add One
+      </button>
+    </>
+  );
+}
+```
