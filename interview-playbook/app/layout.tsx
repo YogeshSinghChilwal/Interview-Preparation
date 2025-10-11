@@ -33,6 +33,9 @@ export const metadata: Metadata = {
     "Devops",
     "MERN Stack",
   ],
+  verification: {
+    google: "google58024bb4b178b29f.html"
+  }
 };
 
 export default function RootLayout({
