@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     "MERN Stack",
   ],
   verification: {
-    google: "google58024bb4b178b29f.html"
+    google: "VJulxxwgQWyDzrlWBWOR4UILCgpxrBMqVfHD9zIN9oY"
   }
 };
 
