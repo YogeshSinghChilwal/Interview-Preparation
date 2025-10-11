@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 
 type DrawCtx = {
@@ -29,6 +30,32 @@ function stripHtmlKeepText(input: string): string {
   return decodeEntities(out);
 }
 
+function sanitizeForPdf(input: string): string {
+  if (!input) return "";
+  let s = input;
+
+  // Normalize common smart punctuation to ASCII
+  s = s
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'")
+    .replace(/[–—]/g, "-")
+    .replace(/…/g, "...")
+    .replace(/\u00A0/g, " "); // non-breaking space to regular space
+
+  // Remove emojis and symbols outside BMP common ranges (emoticons, pictographs, flags, etc.)
+  s = s.replace(
+    /[\u{1F000}-\u{1FAFF}\u{1F300}-\u{1F9FF}\u{1F1E6}-\u{1F1FF}\u{2600}-\u{27BF}]/gu,
+    ""
+  );
+
+  // Drop any remaining characters outside ISO-8859-1/WinAnsi range that StandardFonts typically cover
+  s = Array.from(s)
+    .map((ch) => (ch.codePointAt(0)! <= 0xff ? ch : "?"))
+    .join("");
+
+  return s;
+}
+
 export async function markdownToPdf(
   markdown: string,
   title?: string
@@ -57,7 +84,8 @@ export async function markdownToPdf(
     size: number,
     color = rgb(0, 0, 0)
   ) => {
-    const words = text.split(/\s+/);
+    const safe = sanitizeForPdf(text);
+    const words = safe.split(/\s+/);
     let line = "";
     const lines: string[] = [];
 
@@ -94,15 +122,10 @@ export async function markdownToPdf(
 
   const newPage = () => {
     const p = pdf.addPage([ctx.pageWidth, ctx.pageHeight]);
-    page = p; // Reassigned current page without casting
+    page = p;
+    ctx.x = ctx.margin;
     ctx.y = ctx.pageHeight - ctx.margin;
   };
-
-  // Optional title
-  if (title) {
-    drawWrapped(title, helvBold, 18);
-    ctx.y -= 6;
-  }
 
   const codePaddingX = 8;
   const codePaddingY = 6;
@@ -115,8 +138,7 @@ export async function markdownToPdf(
     size: number,
     maxWidth: number
   ): string[] {
-    // preserve indentation; expand tabs to two spaces for predictable layout
-    const s = (src ?? "").replace(/\t/g, "  ");
+    const s = sanitizeForPdf((src ?? "").replace(/\t/g, "  "));
     if (s.length === 0) return [" "];
 
     const lines: string[] = [];
@@ -238,7 +260,7 @@ export async function markdownToPdf(
       continue;
     }
 
-    const clean = stripHtmlKeepText(raw);
+    const clean = sanitizeForPdf(stripHtmlKeepText(raw));
 
     // Headings
     const headingMatch = /^(#{1,6})\s+(.*)$/.exec(clean);

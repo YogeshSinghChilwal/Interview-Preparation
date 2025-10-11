@@ -3,13 +3,13 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { Spinner } from "@/components/ui/spinner";
+import Playbook from "./Playbook";
 
 const Playbooks = () => {
-  const [loading, setLoading] = useState(false);
+  const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
 
   async function handleGenerate(url: string) {
-    setLoading(true);
+    setLoadingStates(prev => ({ ...prev, [url]: true }));
     try {
       const res = await fetch("/api/convert", {
         method: "POST",
@@ -41,28 +41,27 @@ const Playbooks = () => {
     } catch (err: any) {
       toast.error(err?.message ?? "Something went wrong");
     } finally {
-      setLoading(false);
+      setLoadingStates(prev => ({ ...prev, [url]: false }));
     }
   }
 
+  const reactLink = "https://raw.githubusercontent.com/YogeshSinghChilwal/Interview-Preparation/main/React/react.md";
+  const nextLink = "https://raw.githubusercontent.com/YogeshSinghChilwal/Interview-Preparation/main/Nextjs/nextjs.md";
+
   return (
     <div className="mt-10">
-      <div className="flex flex-col sm:flex-row justify-between text-xl font-semibold ">
-        <h2>React Interview Ques/Ans</h2>
-        <div className="flex items-center gap-2">
-          {loading && <Spinner className="size-5 text-blue-500" />}
-          <button
-            onClick={() =>
-              handleGenerate(
-                "https://raw.githubusercontent.com/YogeshSinghChilwal/Interview-Preparation/main/React/react.md"
-              )
-            }
-            className="border-b-2 border-foreground hover:text-blue-500 hover:border-blue-500 transition-all duration-200"
-          >
-            PDF
-          </button>
-        </div>
-      </div>
+      <Playbook
+        handleGenerate={handleGenerate}
+        loading={loadingStates[reactLink] || false}
+        title="React Interview Ques/Ans"
+        link={reactLink}
+      />
+      <Playbook
+        handleGenerate={handleGenerate}
+        loading={loadingStates[nextLink] || false}
+        title="Next.js Interview Ques/Ans"
+        link={nextLink}
+      />
     </div>
   );
 };
