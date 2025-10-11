@@ -1,5 +1,4 @@
 import React from "react";
-import Playbooks from "./Playbooks";
 
 const Hero = () => {
   return (
@@ -11,8 +10,6 @@ const Hero = () => {
       </p>
 
       <div className="border-t-1 border-foreground mt-10" />
-
-      <Playbooks />
     </div>
   );
 };

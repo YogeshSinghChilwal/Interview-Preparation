@@ -47,7 +47,7 @@ const Playbooks = () => {
 
   return (
     <div className="mt-10">
-      <div className="flex justify-between text-xl font-semibold ">
+      <div className="flex flex-col sm:flex-row justify-between text-xl font-semibold ">
         <h2>React Interview Ques/Ans</h2>
         <div className="flex items-center gap-2">
           {loading && <Spinner className="size-5 text-blue-500" />}

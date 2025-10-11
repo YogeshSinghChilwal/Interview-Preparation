@@ -15,12 +15,24 @@ const geistMono = Geist_Mono({
 });
 
 const openSans = Google_Sans_Code({
-  subsets: ['latin']
-})
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
   title: "Interview Playbook",
-  description: "A free, open-source collection of interview questions, answers, tips & study guides — all in one place.",
+  description:
+    "A free, open-source collection of interview questions, answers, tips & study guides — all in one place.",
+  keywords: [
+    "Next.js",
+    "React",
+    "Interview",
+    "Notes",
+    "Books",
+    "PDF",
+    "Web Development",
+    "Devops",
+    "MERN Stack",
+  ],
 };
 
 export default function RootLayout({
@@ -33,15 +45,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased ${openSans.className}`}
       >
-         <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-            <Toaster />
-          </ThemeProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );
