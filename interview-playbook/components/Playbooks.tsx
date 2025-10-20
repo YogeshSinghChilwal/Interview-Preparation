@@ -47,6 +47,7 @@ const Playbooks = () => {
 
   const reactLink = "https://raw.githubusercontent.com/YogeshSinghChilwal/Interview-Preparation/main/React/react.md";
   const nextLink = "https://raw.githubusercontent.com/YogeshSinghChilwal/Interview-Preparation/main/Nextjs/nextjs.md";
+  const jsLink = "https://raw.githubusercontent.com/YogeshSinghChilwal/Interview-Preparation/main/Javascript/js.md";
 
   return (
     <div className="mt-10">
@@ -61,6 +62,12 @@ const Playbooks = () => {
         loading={loadingStates[nextLink] || false}
         title="Next.js Interview Ques/Ans"
         link={nextLink}
+      />
+      <Playbook
+        handleGenerate={handleGenerate}
+        loading={loadingStates[jsLink] || false}
+        title="JavaScript Interview Ques/Ans"
+        link={jsLink}
       />
     </div>
   );
