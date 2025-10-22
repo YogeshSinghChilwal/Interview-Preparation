@@ -234,7 +234,7 @@ export async function markdownToPdf(
       }
 
       // move cursor below the block plus a small gap
-      ctx.y -= totalHeight + ctx.lineGap;
+      ctx.y -= totalHeight + ctx.lineGap + 10;
       i = end;
     }
   }
@@ -268,9 +268,9 @@ export async function markdownToPdf(
       const level = headingMatch[1].length;
       const text = headingMatch[2];
       const size = level === 1 ? 16 : level === 2 ? 14 : level === 3 ? 12 : 11;
-      ctx.y -= level <= 2 ? 2 : 0;
+      ctx.y -= level <= 2 ? 20 : 0;
       drawWrapped(text, helvBold, size);
-      ctx.y -= level <= 2 ? 6 : 4;
+      ctx.y -= level <= 2 ? 2 : 1;
       continue;
     }
 
