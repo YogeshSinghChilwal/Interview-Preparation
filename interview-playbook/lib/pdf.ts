@@ -82,6 +82,7 @@ export async function markdownToPdf(
     text: string,
     font: any,
     size: number,
+    xSpace: number = 0,
     color = rgb(0, 0, 0)
   ) => {
     const safe = sanitizeForPdf(text);
@@ -110,7 +111,7 @@ export async function markdownToPdf(
     for (const l of lines) {
       if (ctx.y < 60) newPage();
       page.drawText(l, {
-        x: ctx.x,
+        x: ctx.x + xSpace,
         y: ctx.y,
         size,
         font,
@@ -281,9 +282,9 @@ export async function markdownToPdf(
       const bullet = "• ";
       const bulletWidth = helv.widthOfTextAtSize(bullet, 10);
       if (ctx.y < 60) newPage();
-      page.drawText(bullet, { x: ctx.x, y: ctx.y, size: 10, font: helv });
+      page.drawText(bullet, { x: ctx.x + 14, y: ctx.y - 2, size: 14, font: helv });
       ctx.x += bulletWidth;
-      drawWrapped(text, helv, 10);
+      drawWrapped(text, helv, 10 , 16);
       ctx.x -= bulletWidth;
       continue;
     }
