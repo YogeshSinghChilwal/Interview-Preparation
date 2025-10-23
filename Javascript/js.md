@@ -142,9 +142,8 @@ Primitive: string, number, boolean, null, undefined, bigint, symbol.
 
 ### Non-Primitive Data Type
 Non-primitive data types hold collections or references to memory instead of a single value.
-There is only one non-primitive data type in JavaScript: the Object.
 
-Non-primitive: objects, arrays, functions.
+Non-primitive: objects, arrays, functions, Date, map.
 
 ## <span style="color:#FFA500"> 5. Difference between == and ===? </span>
 
@@ -971,17 +970,388 @@ import message from "./message.js";
 message(); // Calls the default exported function
 ```
 
-## <span style="color:#FFA500"> 26.  </span>
-## <span style="color:#FFA500"> 27.  </span>
-## <span style="color:#FFA500"> 28.  </span>
-## <span style="color:#FFA500"> 29.  </span>
-## <span style="color:#FFA500"> 30.  </span>
-## <span style="color:#FFA500"> 31.  </span>
-## <span style="color:#FFA500"> 32.  </span>
-## <span style="color:#FFA500"> 33.  </span>
-## <span style="color:#FFA500"> 34.  </span>
-## <span style="color:#FFA500"> 35.  </span>
-## <span style="color:#FFA500"> 36.  </span>
+## <span style="color:#FFA500"> 26. What are Promises? </span>
+
+A Promise in JavaScript is an object that represents the eventual completion or failure of an asynchronous operation. It helps avoid callback hell and makes async code easier to read.
+
+A Promise can be in one of three states:
+
+- pending → still working
+
+- fulfilled → operation succeeded
+
+- rejected → operation failed
+
+```js
+
+const fetchData = new Promise((resolve, reject) => {
+  const success = true;
+  if (success) resolve("Data fetched!");
+  else reject("Error fetching data");
+});
+
+fetchData
+  .then((res) => console.log(res))    // "Data fetched!"
+  .catch((err) => console.log(err));
+
+```
+
+
+## <span style="color:#FFA500"> 27. Explain async/await. </span>
+
+async/await is a cleaner and more readable way to handle Promises in JavaScript.
+
+- async makes a function return a Promise.
+
+- await pauses the function until the Promise resolves or rejects.
+
+It helps write asynchronous code that looks synchronous.
+
+```js
+
+async function getData() {
+  try {
+    const response = await fetch("https://api.example.com/data");
+    const data = await response.json();
+    console.log(data);
+  } catch (error) {
+    console.log("Error:", error);
+  }
+}
+
+getData();
+
+```
+
+Here, await waits for the fetch to complete before moving to the next line — no .then() needed.
+
+## <span style="color:#FFA500"> 28. What are generators? </span>
+
+A generator is a special type of function in JavaScript that can be paused and resumed.
+It’s defined using function* and uses the yield keyword to pause execution.
+
+Generators return an iterator object that can be used to control execution manually.
+
+```js
+
+function* countNumbers() {
+  yield 1;
+  yield 2;
+  yield 3;
+}
+
+const counter = countNumbers();
+
+console.log(counter.next().value); // 1
+console.log(counter.next().value); // 2
+console.log(counter.next().value); // 3
+
+```
+Each next() call resumes the function from where it last stopped.
+
+## <span style="color:#FFA500"> 29. What are Map, Set, WeakMap, WeakSet? </span>
+
+These are built-in data structures in JavaScript used for storing collections of data — similar to objects and arrays but with different rules.
+
+### Map
+
+- Stores key-value pairs (like objects) but keys can be any type.
+
+- Keeps insertion order.
+
+```js
+const map = new Map();
+map.set('name', 'Yogesh');
+map.set(1, 'Number key');
+console.log(map.get('name')); // Yogesh
+```
+
+### Set
+
+- Stores unique values only (no duplicates).
+
+```js
+
+const set = new Set([1, 2, 2, 3]);
+console.log(set); // Set(3) {1, 2, 3}
+
+```
+
+### WeakMap
+
+- Like Map, but keys must be objects.
+
+- Keys are weakly referenced, meaning if the object is deleted elsewhere, it’s removed from the WeakMap automatically.
+
+```js
+
+let obj = {};
+const weakMap = new WeakMap();
+weakMap.set(obj, 'data');
+obj = null; // key is garbage-collected
+
+```
+
+### WeakSet
+
+- Like Set, but only stores objects and also uses weak references.
+
+```js
+
+let user = { name: 'Yogesh' };
+const weakSet = new WeakSet();
+weakSet.add(user);
+user = null; // object removed automatically
+
+```
+
+Use Map/Set for general data storage, and WeakMap/WeakSet when you want automatic memory cleanup for object references.
+
+
+## <span style="color:#FFA500"> 30. What are symbols? </span>
+
+A Symbol is a unique and immutable primitive value introduced in ES6.
+It’s often used as an object key to avoid property name conflicts — even if two symbols have the same description, they’re always different.
+
+```js
+
+const id1 = Symbol("id");
+const id2 = Symbol("id");
+
+console.log(id1 === id2); // false (each symbol is unique)
+
+const user = {
+  name: "Yogesh",
+  [id1]: 123
+};
+
+console.log(user[id1]); // 123
+
+```
+
+Symbols are useful for creating hidden or private-like properties in objects that won’t accidentally clash with others.
+
+# Asynchronous JavaScript
+
+## <span style="color:#FFA500"> 31. What is the event loop? </span>
+
+The event loop is the mechanism in JavaScript that allows it to handle asynchronous operations (like setTimeout, Promises, etc.) while still being single-threaded.
+
+It continuously checks the call stack and the callback queue:
+
+- If the call stack is empty,
+
+- It takes a function from the queue and pushes it to the stack to execute.
+
+This is how JavaScript performs non-blocking operations.
+
+```js
+
+console.log("Start");
+
+setTimeout(() => console.log("Timeout"), 0);
+
+Promise.resolve().then(() => console.log("Promise"));
+
+console.log("End");
+
+OUTPUT:
+
+Start
+End
+Promise
+Timeout
+
+```
+
+The Promise callback runs before setTimeout because microtasks (Promises) have higher priority than macrotasks (timers) in the event loop.
+
+## <span style="color:#FFA500"> 32. Difference between synchronous and asynchronous code? </span>
+
+- Synchronous code runs line by line, where each task waits for the previous one to finish — blocking execution.
+
+- Asynchronous code runs non-blocking, allowing other tasks to continue while waiting for an operation (like fetching data) to complete.
+
+Example (Synchronous):
+```js
+console.log("1");
+console.log("2");
+console.log("3");
+// Output: 1 2 3
+```
+
+Example (Asynchronous):
+```js
+console.log("1");
+setTimeout(() => console.log("2"), 1000);
+console.log("3");
+// Output: 1 3 2
+```
+
+Asynchronous code improves performance by not stopping execution during slow tasks like API calls or file reads.
+
+
+## <span style="color:#FFA500"> 33. What are microtasks and macrotasks? </span>
+
+In JavaScript, microtasks and macrotasks are two types of tasks managed by the event loop. They define when callbacks are executed.
+
+### Microtasks
+
+- Come from Promises, queueMicrotask(), and MutationObservers.
+
+- Run right after the current code and before any macrotasks.
+
+- Have higher priority.
+
+```js
+Promise.resolve().then(() => console.log("Microtask"));
+```
+
+### Macrotasks
+
+- Come from setTimeout, setInterval, setImmediate, I/O, and DOM events.
+
+- Run after all microtasks in the current cycle finish.
+
+```js
+setTimeout(() => console.log("Macrotask"), 0);
+```
+
+### Example Together:
+
+```js
+
+console.log("Start");
+
+setTimeout(() => console.log("Macrotask"), 0);
+Promise.resolve().then(() => console.log("Microtask"));
+
+console.log("End");
+
+OUTPUT:
+
+Start
+End
+Microtask
+Macrotask
+```
+
+The microtask queue is emptied before the macrotask queue starts.
+
+## <span style="color:#FFA500"> 34. What is callback hell? </span>
+
+Callback hell happens when multiple asynchronous operations are nested inside each other, making the code hard to read, debug, and maintain.
+
+It usually looks like a pyramid of nested callbacks.
+
+```js
+
+getUser((user) => {
+  getPosts(user.id, (posts) => {
+    getComments(posts[0].id, (comments) => {
+      console.log(comments);
+    });
+  });
+});
+
+```
+
+The code grows horizontally, becoming messy and error-prone.
+
+### Solution:
+Use Promises or async/await to flatten the structure:
+
+```js
+async function showComments() {
+  const user = await getUser();
+  const posts = await getPosts(user.id);
+  const comments = await getComments(posts[0].id);
+  console.log(comments);
+}
+```
+
+## <span style="color:#FFA500"> 35. How does fetch API work? </span>
+
+The Fetch API is a modern way to make HTTP requests in JavaScript.
+It returns a Promise that resolves to a Response object, which you can convert to JSON, text, or other formats.
+
+### Basic Steps:
+
+- Call fetch(url) → returns a Promise.
+
+- Use .then() or await to get the response.
+
+- Parse the response (e.g., response.json()).
+
+```js
+
+// Using Promises
+fetch("https://api.example.com/data")
+  .then((res) => res.json())
+  .then((data) => console.log(data))
+  .catch((err) => console.log("Error:", err));
+
+// Using async/await
+async function getData() {
+  try {
+    const res = await fetch("https://api.example.com/data");
+    const data = await res.json();
+    console.log(data);
+  } catch (err) {
+    console.log("Error:", err);
+  }
+}
+getData();
+```
+
+Fetch is promise-based, unlike older XMLHttpRequest, making async requests simpler and cleaner.
+
+## <span style="color:#FFA500"> 36. Explain Promise.all, race, and allSettled. </span>
+
+These are Promise combinators that handle multiple Promises at once.
+
+### Promise.all
+
+- Waits for all Promises to resolve.
+
+- If any Promise rejects, it rejects immediately.
+
+```js
+Promise.all([
+  Promise.resolve(1),
+  Promise.resolve(2)
+]).then(console.log); // [1, 2]
+```
+
+### Promise.race
+
+Resolves or rejects as soon as the first Promise settles.
+
+```js
+Promise.race([
+  new Promise(res => setTimeout(() => res("A"), 500)),
+  new Promise(res => setTimeout(() => res("B"), 100))
+]).then(console.log); // "B"
+```
+
+### Promise.allSettled
+
+- Waits for all Promises to settle (resolve or reject).
+
+- Returns an array with each Promise’s status and value/reason.
+
+```js
+
+Promise.allSettled([
+  Promise.resolve(1),
+  Promise.reject("Error")
+]).then(console.log);
+/* [
+  { status: "fulfilled", value: 1 },
+  { status: "rejected", reason: "Error" }
+] */
+```
+
 ## <span style="color:#FFA500"> 37.  </span>
 ## <span style="color:#FFA500"> 38.  </span>
 ## <span style="color:#FFA500"> 39.  </span>
