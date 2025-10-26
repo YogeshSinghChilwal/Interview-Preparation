@@ -1352,7 +1352,380 @@ Promise.allSettled([
 ] */
 ```
 
-## <span style="color:#FFA500"> 37.  </span>
-## <span style="color:#FFA500"> 38.  </span>
-## <span style="color:#FFA500"> 39.  </span>
-## <span style="color:#FFA500"> 40.  </span>
+## <span style="color:#FFA500"> 37. What is debouncing and throttling? </span>
+
+Debouncing waits to run a function until a certain time has passed since the last event—useful for things like search input, so it only triggers once the user stops typing for a while. Throttling lets a function run at most once every set interval, good for actions like scroll or resize, so the function doesn’t overload the browser.
+
+```js
+function debounce(func, delay) {
+  let timer;
+  return function(...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => func.apply(this, args), delay);
+  };
+}
+
+const debouncedSearch = debounce((query) => {
+  console.log("Search for:", query);
+}, 500);
+
+document.getElementById("searchBox").addEventListener("input", (e) => {
+  debouncedSearch(e.target.value);
+});
+```
+
+This waits until 500ms after you stop typing before running the search.
+
+Throttling Example
+
+```js
+
+function throttle(func, limit) {
+  let inThrottle;
+  return function(...args) {
+    if (!inThrottle) {
+      func.apply(this, args);
+      inThrottle = true;
+      setTimeout(() => inThrottle = false, limit);
+    }
+  };
+}
+
+const throttledScroll = throttle(() => {
+  console.log("Scrolled");
+}, 1000);
+
+window.addEventListener("scroll", throttledScroll);
+```
+
+Here, the function logs “Scrolled” at most once every second, no matter how often the scroll event fires.
+
+## <span style="color:#FFA500"> 38. What is async iteration? </span>
+
+Async iteration lets you loop over data that arrives over time (like data from a server or a stream), using the for await...of loop. It works with objects that use Symbol.asyncIterator and return Promises.
+
+```js
+const asyncIterable = {
+  async *[Symbol.asyncIterator]() {
+    yield "a";
+    await new Promise(r => setTimeout(r, 100));
+    yield "b";
+  }
+};
+
+// Loop over values, waiting for each
+(async () => {
+  for await (const value of asyncIterable) {
+    console.log(value); // prints "a", then "b"
+  }
+})();
+```
+
+- Use cases: reading files, processing HTTP streams, or fetching data in chunks.​
+
+- Regular for...of waits for values right away. for await...of waits for Promises to resolve before moving to the next value
+
+
+
+## <span style="color:#FFA500"> 39. What is Web API? </span>
+
+A Web API (Application Programming Interface) is a set of tools and rules that lets programs communicate with web services or browser features. In JavaScript, Web APIs allow you to work with browser things like the DOM, fetch data from servers, use geolocation, or interact with hardware.
+
+Examples:
+### Browser Web API (like DOM):
+
+```js
+document.getElementById("demo").textContent = "Hello!";
+```
+
+### Fetch API:
+
+```js
+fetch('https://api.example.com/data')
+  .then(response => response.json())
+  .then(data => console.log(data));
+```
+
+Some Web APIs are built into browsers (like localStorage, Geolocation, and Fetch), and some are third-party APIs (like Twitter or YouTube Web APIs).​
+
+Web APIs make it easier to build interactive, connected, and modern web applications.
+
+## <span style="color:#FFA500"> 40. Difference between process.nextTick() and setImmediate()? </span>
+
+The difference between process.nextTick() and setImmediate() in Node.js lies in when they execute relative to the event loop:
+
+- process.nextTick() schedules a callback to run immediately after the current operation completes, before the event loop continues. It runs before any I/O or timer events, allowing urgent tasks to run first. However, excessive use can starve the event loop and block I/O.​
+
+- setImmediate() schedules a callback to run on the next iteration of the event loop, after I/O events in the current loop finish. It's useful for deferring execution until after current I/O operations without blocking.​
+
+Example:
+```js
+console.log('Start');
+
+process.nextTick(() => {
+  console.log('Next Tick');
+});
+
+setImmediate(() => {
+  console.log('Set Immediate');
+});
+
+console.log('End');
+
+
+Output order:
+
+text
+Start
+End
+Next Tick
+Set Immediate
+```
+
+# DOM, BOM, and Browser Concepts
+
+## <span style="color:#FFA500"> 41. What is the DOM? </span>
+
+The DOM (Document Object Model) is a programming interface for web documents that represents the structure of a webpage as a tree of objects or nodes. It allows JavaScript to access, modify, and interact with the content, structure, and style of a webpage dynamically.​
+
+Each element, attribute, and text in an HTML document is a node in the DOM tree. JavaScript can manipulate these nodes to change the page on the fly—for example, adding elements, changing text, or handling user events.​
+
+Example:
+
+```js
+const heading = document.createElement("h1");
+heading.textContent = "Hello, DOM!";
+document.body.appendChild(heading);
+```
+
+This creates a new heading in the page dynamically using the DOM.
+
+In short, the DOM acts as a bridge between the static HTML document and dynamic JavaScript, enabling interactive web pages.
+
+## <span style="color:#FFA500"> 42. How to manipulate the DOM? </span>
+
+Manipulating the DOM means changing the webpage's structure, content, or style using JavaScript.
+
+### Common ways to manipulate the DOM:
+```js
+
+//Select elements:
+const element = document.getElementById("myId");
+
+//Change content:
+element.textContent = "New text!";
+
+//Modify styles:
+element.style.color = "blue";
+
+//Create and add new elements:
+const newDiv = document.createElement("div");
+newDiv.textContent = "Hello World";
+document.body.appendChild(newDiv);
+
+//Remove elements:
+element.remove();
+
+//Add event listeners:
+element.addEventListener("click", () => alert("Clicked!"));
+```
+
+Manipulating the DOM is how JavaScript makes web pages interactive and dynamic by updating the page without reloading it.
+
+## <span style="color:#FFA500"> 43. What is event delegation? </span>
+
+Event delegation is a technique in JavaScript where instead of adding event listeners to many child elements, you add one event listener to their common parent. The event bubbles up from the child element to the parent, and the parent handles the event by checking the event's target to see which child triggered it.​
+
+Why use event delegation?
+Saves memory and improves performance by reducing the number of event listeners.
+
+Handles dynamically added elements without extra listeners.
+
+Simple example:
+
+```js
+document.getElementById('parent').addEventListener('click', function(event) {
+  if (event.target.tagName === 'BUTTON') {
+    console.log('Button clicked:', event.target.textContent);
+  }
+});
+```
+
+Here, a single listener on the parent catches clicks on any button inside.​
+
+
+## <span style="color:#FFA500"> 44. How to prevent default behavior? </span>
+
+To prevent the default behavior of an event in JavaScript, use the event.preventDefault() method inside an event handler. This stops the browser's default action associated with that event.
+
+Examples:
+### Preventing a link from navigating:
+
+```js
+document.querySelector('a').addEventListener('click', function(event) {
+  event.preventDefault();
+  console.log('Link click prevented');
+});
+```
+
+### Preventing a form from submitting:
+
+```js
+document.querySelector('form').addEventListener('submit', function(event) {
+  event.preventDefault();
+  console.log('Form submission prevented');
+});
+```
+
+## <span style="color:#FFA500"> 45. How to store data in browser? </span>
+
+You can store data in the browser mainly using these methods:
+
+1. localStorage
+    - Stores key-value pairs persistently (data stays even after browser closes).
+
+    - Simple API to set, get, remove data.
+
+```js
+localStorage.setItem("username", "JohnDoe"); // Store
+const user = localStorage.getItem("username"); // Retrieve
+localStorage.removeItem("username"); // Remove
+```
+
+2. sessionStorage
+    - Similar to localStorage but data lasts only for the session (cleared when tab/window closes).
+
+```js
+sessionStorage.setItem("sessionID", "12345");
+const sessionId = sessionStorage.getItem("sessionID");
+sessionStorage.removeItem("sessionID");
+```
+3. Cookies
+    - Small pieces of data sent to the server with each request.
+
+    - Used for sessions, authentication, etc.
+
+Notes:
+localStorage and sessionStorage store only strings. To store objects, use JSON.stringify() and JSON.parse():
+
+```js
+localStorage.setItem("user", JSON.stringify({ name: "John" }));
+const user = JSON.parse(localStorage.getItem("user"));
+localStorage capacity is around 5MB depending on the browser.
+```
+
+These methods are useful for saving user preferences, session data, or offline/cache data on the client side without involving the server.
+
+## <span style="color:#FFA500"> 46. What is CORS? </span>
+
+CORS (Cross-Origin Resource Sharing) is a browser security mechanism that controls how web pages from one origin (domain, protocol, or port) can request resources (like APIs, fonts, or images) from a different origin.​
+
+### Why CORS exists:
+Browsers restrict cross-origin requests by default to protect users from malicious sites stealing data (this is called the same-origin policy). CORS provides a controlled way to safely allow cross-origin requests by using HTTP headers.
+
+### How it works:
+- The browser sends a request with an Origin header.
+
+- The server responds with Access-Control-Allow-Origin to specify which domains can access the resource.
+
+- For certain requests, the browser sends a "preflight" OPTIONS request to check if the server permits it.
+
+- If the server allows, the browser proceeds; otherwise, it blocks the request.
+
+Simple example of allowing cross-origin:
+
+```text
+Access-Control-Allow-Origin: https://example.com
+```
+
+This would allow scripts from https://example.com to access the resource.
+
+## <span style="color:#FFA500"> 47. What is debouncing used for (e.g., in search)? </span>
+
+Debouncing is used to limit how often a function runs, especially for events that happen frequently, like typing in a search box.​
+
+### Use in search:
+When a user types, you don’t want to send a search request on every keystroke because it overloads the server. Instead, debounce waits until the user stops typing for a set time (like 300ms) and then triggers the search function once. This reduces unnecessary calls and improves performance.
+
+Simple example:
+
+```js
+function debounce(func, delay) {
+  let timer;
+  return function(...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => func.apply(this, args), delay);
+  };
+}
+
+const search = (query) => console.log('Searching for:', query);
+
+const debouncedSearch = debounce(search, 300);
+
+// Simulate typing
+debouncedSearch('he');
+debouncedSearch('hel');
+debouncedSearch('hell');
+debouncedSearch('hello'); // Only this triggers after 300ms
+```
+
+This way, the search function runs only once after the user stops typing, conserving resources and providing faster results.
+
+## <span style="color:#FFA500"> 48. Difference between innerHTML, textContent, innerText? </span>
+
+- innerHTML: parses HTML tags.
+
+- textContent: raw text, no HTML.
+
+- innerText: visible text (respects CSS).
+
+## <span style="color:#FFA500"> 49. What is shadow DOM? </span>
+
+Shadow DOM is a web standard that allows developers to create a hidden, encapsulated DOM tree (called the "shadow tree") attached to an element (the "shadow host"). This subtree is separate from the main DOM, meaning its styles and scripts are isolated and don’t affect or get affected by the rest of the page’s DOM.​
+
+Key points:
+- It enables component encapsulation, so styles and markup don’t leak out or break other parts of the page.
+
+- The shadow DOM has its own isolated scope for HTML, CSS, and JavaScript.
+
+- It's commonly used in web components for building reusable and self-contained UI elements.
+
+- The shadow boundary separates the shadow DOM from the main DOM.
+
+- Browsers have used it internally for native controls (e.g., 'video' element controls use shadow DOM).
+
+Simple usage example:
+
+```js
+const host = document.getElementById('hostElement');
+const shadowRoot = host.attachShadow({ mode: 'open' });
+shadowRoot.innerHTML = `<style>p { color: red; }</style><p>This is in shadow DOM</p>`;
+```
+This creates a shadow DOM inside the hostElement where styles and elements inside are isolated from the main document.
+
+In short, shadow DOM provides DOM and style encapsulation to build more robust and modular web components.
+
+## <span style="color:#FFA500"> 50. How does garbage collection work? </span>
+
+Garbage collection in JavaScript is an automatic process where the JavaScript engine frees up memory by removing objects that are no longer reachable or needed by the program.​
+
+### How it works (Mark-and-Sweep algorithm):
+1. The GC starts with a set of root objects like global variables and currently executing functions.
+
+2. It marks all objects reachable from these roots by following all references.
+
+3. Then it sweeps through memory and removes objects that were not marked (unreachable).
+
+4. This frees memory occupied by objects no longer accessible by your code.
+
+### Important notes:
+- Objects become unreachable if there are no references pointing to them.
+
+- GC runs periodically and automatically; you can’t force garbage collection in JavaScript.
+
+- Modern engines optimize GC with techniques like generational and incremental collection to reduce pauses.
+
+Simple analogy:
+Think of GC as spilling paint on roots and following branches—anything not touched by the paint is garbage and cleaned up.
+
+This keeps JavaScript apps efficient by reclaiming memory without manual intervention.
