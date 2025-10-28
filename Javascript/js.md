@@ -1729,3 +1729,191 @@ Simple analogy:
 Think of GC as spilling paint on roots and following branches—anything not touched by the paint is garbage and cleaned up.
 
 This keeps JavaScript apps efficient by reclaiming memory without manual intervention.
+
+## <span style="color:#FFA500"> 51. What is the difference between deep copy and shallow copy? </span>
+
+A shallow copy copies only the top-level properties of an object, so nested objects or arrays still reference the same memory as the original. A deep copy duplicates all levels, making nested objects completely independent of the original.​
+
+Example
+### Shallow Copy:
+
+```js
+const obj = { a: 1, b: { c: 2 } };
+const shallow = { ...obj };
+shallow.b.c = 3;
+// obj.b.c is also 3 (same reference)
+```
+
+### Deep Copy:
+
+```js
+const obj = { a: 1, b: { c: 2 } };
+const deep = JSON.parse(JSON.stringify(obj));
+deep.b.c = 4;
+// obj.b.c is still 2 (different reference)
+```
+
+## <span style="color:#FFA500"> 52. What is currying in JavaScript? </span>
+
+Currying in JavaScript is the process of transforming a function with multiple arguments into a sequence of functions, each taking a single argument.​
+
+Example
+### Normal function:
+
+```js
+function add(a, b, c) {
+  return a + b + c;
+}
+add(1, 2, 3); // 6
+```
+
+### Curried version:
+
+```js
+function curriedAdd(a) {
+  return function(b) {
+    return function(c) {
+      return a + b + c;
+    }
+  }
+}
+curriedAdd(1)(2)(3); // 6
+
+// Arrow function
+
+const add = a => b => a + b;
+
+
+```
+Currying makes it easy to create specialized functions and use partial application
+
+## <span style="color:#FFA500"> 53. Explain memoization. </span>
+
+emoization is an optimization technique that speeds up function calls by caching the results of expensive computations and returning the cached result when the same inputs occur again.​
+
+Example
+### Memoized Fibonacci function:
+
+```js
+function fib(n, memo = {}) {
+  if (memo[n]) return memo[n];
+  if (n <= 1) return 1;
+  memo[n] = fib(n-1, memo) + fib(n-2, memo);
+  return memo[n];
+}
+```
+
+With memoization, repeated calls with the same arguments are much faster because the result is reused from the cache.
+
+## <span style="color:#FFA500"> 54. What is composition in JavaScript functions? </span>
+
+Composition in JavaScript functions means creating a new function by combining multiple functions, where the output of one function becomes the input of the next. This lets you build complex operations by chaining simple functions together.​
+
+Example
+```js
+const add2 = (x) => x + 2;
+const square = (x) => x * x;
+
+// Compose: runs from right to left (square first, then add2)
+const composed = (x) => add2(square(x));
+console.log(composed(3)); // 11
+
+// Or, using a utility:
+const compose = (...fns) => (x) => fns.reduceRight((val, fn) => fn(val), x);
+const add2ThenSquare = compose(square, add2);
+console.log(add2ThenSquare(3)); // 25
+```
+
+Composition helps keep code modular, readable, and reusable.
+
+## <span style="color:#FFA500"> 55. What are polyfills? </span>
+
+Polyfills are pieces of JavaScript code that add modern features to older browsers or environments that don't natively support them. They act as a fallback, allowing developers to use new methods, APIs, or standards while ensuring compatibility across all browsers.​
+
+Example
+Suppose Array.prototype.includes is not supported in an old browser. A polyfill can add this method:
+
+```js
+if (!Array.prototype.includes) {
+  Array.prototype.includes = function(searchElement) {
+    for (let i = 0; i < this.length; i++) {
+      if (this[i] === searchElement) return true;
+    }
+    return false;
+  };
+}
+```
+
+Now, [10][11][12].includes(2) works everywhere, even if the browser is outdated.
+
+## <span style="color:#FFA500"> 56. What is the difference between mutable and immutable objects? </span>
+
+Mutable objects in JavaScript can be changed after they are created, while immutable objects cannot be changed—their content always stays the same unless you make a new object.​
+
+Example
+
+### Mutable:
+
+```js
+let obj = { name: 'John' };
+obj.name = 'Jane'; // obj is now { name: 'Jane' }
+```
+
+### Immutable:
+
+```js
+const frozenObj = Object.freeze({ name: 'John' });
+frozenObj.name = 'Jane'; // Nothing changes; still { name: 'John' }
+```
+
+Arrays and objects are mutable by default, but you can use Object.freeze() or similar techniques to make them immutable. Primitive types like numbers and strings are always immutable—they can’t be changed in place.
+
+## <span style="color:#FFA500"> 57. Explain call stack overflow. </span>
+
+A call stack overflow in JavaScript occurs when the call stack exceeds its memory limit due to too many nested or recursive function calls, typically from infinite or very deep recursion. The call stack is a memory structure that tracks function execution by storing each active function call. When functions keep calling each other without proper termination, the stack fills up and triggers a "stack overflow" error, causing the program to crash or halt execution.​
+
+Example
+```js
+function recurse() {
+  recurse(); // Calls itself infinitely
+}
+recurse(); // This causes call stack overflow error
+```
+
+This happens because each function call adds to the call stack, and without a base case to stop recursion, the calls never return, exhausting stack space.​
+
+In summary, call stack overflow signals excessive function calls that exceed the stack's capacity, often from infinite recursion or extremely deep call chains, and it requires fixing the recursion or call logic to avoid it.
+
+## <span style="color:#FFA500"> 58. What are Tagged Template Literals? </span>
+
+Tagged Template Literals in JavaScript allow you to customize how a template literal is processed by passing it to a function (called a "tag"). Instead of just producing a string with interpolation, the tag function receives the raw string parts and the evaluated expressions separately, letting you manipulate or transform them before returning a result.​
+
+Example
+
+```js
+function highlight(strings, ...values) {
+  return strings.reduce((result, str, i) => result + str + (values[i] ? `<b>${values[i]}</b>` : ''), '');
+}
+
+const name = "Alice";
+const age = 25;
+
+console.log(highlight`Name: ${name}, Age: ${age}`);
+// Output: Name: <b>Alice</b>, Age: <b>25</b>
+
+```
+
+Here, the highlight function receives the literal segments and expression values, then formats the output by wrapping the values in 'b' tags. This gives you power to control formatting, escaping, or any custom processing when using template literals.
+
+## <span style="color:#FFA500"> 59.  </span>
+## <span style="color:#FFA500"> 60.  </span>
+## <span style="color:#FFA500"> 61.  </span>
+## <span style="color:#FFA500"> 62.  </span>
+## <span style="color:#FFA500"> 63.  </span>
+## <span style="color:#FFA500"> 64.  </span>
+## <span style="color:#FFA500"> 65.  </span>
+## <span style="color:#FFA500"> 66.  </span>
+## <span style="color:#FFA500"> 67.  </span>
+## <span style="color:#FFA500"> 68.  </span>
+## <span style="color:#FFA500"> 69.  </span>
+## <span style="color:#FFA500"> 70.  </span>
